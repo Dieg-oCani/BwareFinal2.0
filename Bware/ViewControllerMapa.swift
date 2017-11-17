@@ -12,17 +12,8 @@
  import ContactsUI
  import MessageUI // para mensajes preprogramados
  
- class ViewControllerMapa: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate, URLSessionDownloadDelegate, CNContactPickerDelegate, UITableViewDelegate, UITableViewDataSource, MFMessageComposeViewControllerDelegate{
+ class ViewControllerMapa: UIViewController, CLLocationManagerDelegate, MKMapViewDelegate, URLSessionDownloadDelegate, CNContactPickerDelegate, UITableViewDelegate, UITableViewDataSource, MFMessageComposeViewControllerDelegate, GIDSignInUIDelegate{
     
-    //Para los mensajes, delegado
-    
-    func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith result: MessageComposeResult) {
-        self.dismiss(animated: true, completion: nil)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        self.navigationController?.isNavigationBarHidden = false
-    }
     
     // variables
     var menuIsShown: Bool = false
@@ -47,17 +38,18 @@
     
     var msg: String = "Esta es mi ubicación, estoy en peligro!"
     
-    // ------------------------------ Metodo sms compartir ------------------------------
+    
+    // Metodo sms compartir -------------------------------________________________________________
     @IBAction func compartir(_ sender: Any) {
-        print("compartir")
-        let mensaje    =    msg + "\nUbicación:\n" + String(format:"%f",(gps.location?.coordinate.latitude)!) + "\n" + String(format:"%f",(gps.location?.coordinate.longitude)!)
+        //print("compartir")
+        let mensaje = msg + "https://www.google.com.mx/maps/@\(gps.location?.coordinate.latitude),\(gps.location?.coordinate.longitude)z?hl=es"
         let items:    [Any]    =    [mensaje]
         let ac =    UIActivityViewController(activityItems:    items,    applicationActivities:    nil)
         ac.excludedActivityTypes =    [UIActivityType.message,    .airDrop,    .print]
         self.present(ac,    animated:    true,    completion:    nil)
         
         //Enviar SMS
-        print("enviando sms")
+        //print("enviando sms")
         if(MFMessageComposeViewController.canSendText()) {
             let controller = MFMessageComposeViewController()
             controller.body = mensaje
@@ -75,7 +67,16 @@
             //self.present(controller, animated: true, completion: nil)
         }
     }
-    // ----------------------------------------------------------------------------
+    
+    // Para los mensajes, delegado ______________________________________________________________
+    
+    func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith result: MessageComposeResult) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        self.navigationController?.isNavigationBarHidden = false
+    }
     
     
     //  Metodos para obtener contactos __________________________________________________________
@@ -103,15 +104,15 @@
     
     // Esta funcion selecciona un contacto para agregarlo a la lista de contactos de emergencia.
     func contactPicker(_ picker: CNContactPickerViewController, didSelect contact: CNContact) {
-        print(contact.givenName)
+        //print(contact.givenName)
         
         
         self.perform(#selector(agregarContacto2(_:)), with: contact, afterDelay: 2)
         
         
         for contacto in arregloContactos{
-            print(contacto.givenName)
-            print(contacto.phoneNumbers)
+            //print(contacto.givenName)
+            //print(contacto.phoneNumbers)
         }
     }
     
@@ -168,28 +169,30 @@
         if(arregloContactos.count != 0){
             celda.textLabel?.text = arregloContactos[indexPath.row].givenName   // Agrega en la primera celda el nombre del contacto
             celda.detailTextLabel?.text = ((arregloContactos[indexPath.row].phoneNumbers[0].value ).value(forKey: "digits") as! String)
-            // (contact.phoneNumbers[0].value as! CNPhoneNumber).valueForKey("digits") as! String
         }
         
         return celda
     }
     
-    // NUEVOOOOOOOOOOOOOOOOOOOOOOOOOO09O0OO0O0O0O0O0O0O0O0O0OO0O
+    // Para realizar una llamada cuando se da click a un contacto______________________________________________
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let celda = tableView.dequeueReusableCell(withIdentifier: "celdaContactos",for: indexPath)
         
         let url: NSURL = URL(string: ((arregloContactos[indexPath.row].phoneNumbers[0].value ).value(forKey: "digits") as! String))! as NSURL
         UIApplication.shared.open(url as URL, options: [:], completionHandler: nil)
-        print("\n")
-        print(arregloContactos[indexPath.row].phoneNumbers)
+        //print("\n")
+        //print(arregloContactos[indexPath.row].phoneNumbers)
+        
+        if let url = NSURL(string: "tel://\(((arregloContactos[indexPath.row].phoneNumbers[0].value ).value(forKey: "digits") as! String))"), UIApplication.shared.canOpenURL(url as URL) {
+            UIApplication.shared.openURL(url as URL)
+        }
+        
+        
     }
     
-    func makeAPhoneCall()  {
-        let url: NSURL = URL(string: "TEL://1234567890")! as NSURL
-        UIApplication.shared.open(url as URL, options: [:], completionHandler: nil)
-    }
-    // NUEVOOOOOOOOOOOOOOOOOOOOOOOOOO09O0OO0O0O0O0O0O0O0O0O0OO0O
+    
+    
     
     // Métodos para sobreescribir los user defaults  ____________________________________________
     
@@ -212,9 +215,11 @@
         
         arregloContactos = arregloContactosGuardados
 
+        /*
         if arregloContactos.count > 0 {
             print("\n(arregloContactos.count)\n\(arregloContactos[0].givenName)")
         }
+        */
         
         tablaContactos.reloadData()
     }
@@ -228,15 +233,7 @@
 
         preferencias.synchronize()
     }
-    
-    
-     // Métodos para sobreescribir los user defaults  ____________________________________________
-    
-    
-    
-    
-    
-    
+
     
     //___________________________________________________________________________________________
 
@@ -244,6 +241,7 @@
         super.viewDidLoad()
         descargarPines()
         configurarMapa()
+        // self.navigationItem.setHidesBackButton(true, animated: false)
         // Do any additional setup after loading the view.
         // listMajors()
         //showContactsPicker()
@@ -254,44 +252,95 @@
         nc.addObserver(self, selector: #selector(iniciar), name: NSNotification.Name.UIApplicationDidBecomeActive, object: nil)
         nc.addObserver(self, selector: #selector(terminar), name: NSNotification.Name.UIApplicationWillResignActive, object: nil)
         */
-        
+        self.navigationItem.hidesBackButton = true
+        let newBackButton = UIBarButtonItem(title: "Sign Out", style: UIBarButtonItemStyle.plain, target: self, action: #selector(back))
+        self.navigationItem.leftBarButtonItem = newBackButton
     }
     
+    @objc func back(sender: UIBarButtonItem) {
+        // Perform your custom actions
+        // ...
+        // Go back to the previous ViewController
+        GIDSignIn.sharedInstance().signOut()
+        //print("El usuario se salió de la cuenta con éxito")
+        _ = navigationController?.popViewController(animated: true)
+    }
+
+    
     // ---------------------------------------------- PREFERENCIAS ----------------------------------------------
+    
+    
     override func viewDidAppear(_ animated: Bool) {
-        print("Entrando")
+        //print("Entrando")
         let preferencias = UserDefaults.standard
         preferencias.synchronize()
-        
-        let decoded = UserDefaults.standard.object(forKey: "listaContactos") as! Data
-        let arregloContactosGuardados = NSKeyedUnarchiver.unarchiveObject(with: decoded) as! [CNContact]
-        arregloContactos = arregloContactosGuardados
-        
-        if arregloContactos.count > 0 {
-            print("\n(arregloContactos.count)\n\(arregloContactos[0].givenName)")
+        let decoded = UserDefaults.standard.object(forKey: "listaContactos") as? Data
+        if(decoded != nil){
+            let arregloContactosGuardados = NSKeyedUnarchiver.unarchiveObject(with: decoded!) as! [CNContact]
+            arregloContactos = arregloContactosGuardados
+            /*
+            if arregloContactos.count > 0 {
+                print("\n(arregloContactos.count)\n\(arregloContactos[0].givenName)")
+            }
+            */
+            tablaContactos.reloadData()
         }
-        
-        tablaContactos.reloadData()
+        let decodedDate = UserDefaults.standard.object(forKey: "fechaGuardada")
+        if(decodedDate != nil){
+            let fechaGuardadaPreferencias = NSKeyedUnarchiver.unarchiveObject(with: decodedDate! as! Data)
+            oldPinDate = fechaGuardadaPreferencias as! String
+            isOldPinCreated = true
+        }
     }
     
     
     override func viewDidDisappear(_ animated: Bool) {
-        print("Saliendo")
+        //print("Saliendo")
         let preferencias = UserDefaults.standard
         
         let encodeData = NSKeyedArchiver.archivedData(withRootObject: arregloContactos)
         preferencias.set(encodeData, forKey: "listaContactos")
-
+        
+        let encodedDate = NSKeyedArchiver.archivedData(withRootObject: oldPinDate)
+        preferencias.set(encodedDate, forKey: "fechaGuardada")
+        
         preferencias.synchronize()
     }
      // ---------------------------------------------------------------------------------------------------------
     
     
+    //contador para pines junto con su timer
+    //contador para pines por dia, guarda la variable oldPinDate e preferencias
+    
+    var pinCounter = 0
+    var pinLimit = 5
+    
+    var date: Date? = nil
+    var formatter: DateFormatter? = nil
+    
+    var oldPinDate: String = ""
+    var currentDate: String = ""
+    
+    var isOldPinCreated: Bool = false
     
     @IBAction func subirAlerta(_ sender: Any) {
-        uploadPin(title: "Alerta", subtitle: subtitulo.text!, lat: (gps.location?.coordinate.latitude)!, lon: (gps.location?.coordinate.longitude)!)
-        //uploadPin(title: "Aledsdrta", subtitle: "sda", lat:123.34, lon:12.3432)
-        btPin(titulo: "Alerta", subtitulo: subtitulo.text!, lat: (gps.location?.coordinate.latitude)!, long: (gps.location?.coordinate.longitude)!)
+        formatter?.dateFormat = "dd.MM.yyyy"
+        currentDate = (formatter?.string(from: date!))!
+        if(currentDate != oldPinDate && isOldPinCreated){
+            pinCounter = 0
+        }
+        pinCounter += 1
+        if(pinCounter < pinLimit){
+            uploadPin(title: "Alerta", subtitle: subtitulo.text!, lat: (gps.location?.coordinate.latitude)!, lon: (gps.location?.coordinate.longitude)!)
+            btPin(titulo: "Alerta", subtitulo: subtitulo.text!, lat: (gps.location?.coordinate.latitude)!, long: (gps.location?.coordinate.longitude)!)
+        }else{
+            oldPinDate = (formatter?.string(from: date!))!
+            isOldPinCreated = true
+            //guardar fecha en preferencias
+            let alert = UIAlertController(title: "Alert", message: "Ya subiste suficientes pines", preferredStyle: UIAlertControllerStyle.alert)
+            alert.addAction(UIAlertAction(title: "Click", style: UIAlertActionStyle.default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
         menuPinIsShown = false;
         ponerPin.isHidden = true;
     }
@@ -318,6 +367,15 @@
         }
     }
     
+    @IBAction func cancelarAlertaBtn(_ sender: Any) {
+        if menuPinIsShown{
+            ponerPin.isHidden = true
+            menuPinIsShown = false
+        } else {
+            ponerPin.isHidden = false
+            menuPinIsShown = true
+        }
+    }
     
     func descargarPines(){
         let dir = "http://bware32.000webhostapp.com/pin.dat"
@@ -342,26 +400,16 @@
         var request = URLRequest(url: url)
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
-        //let postString = "id=13&name=Jack"
         let postString = "title=\(title)&subtitle=\(subtitle)&lat=\(lat)&lon=\(lon)";
         request.httpBody = postString.data(using: .utf8)
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data, error == nil else {  // check for fundamental networking error
-                //print("error=\(error)")
                 print("Error 1")
                 return
             }
-            
-            
             if let httpStatus = response as? HTTPURLResponse, httpStatus.statusCode != 200 {           // check for http errors
-                //print("statusCode should be 200, but is \(httpStatus.statusCode)")
-                //print("response = \(response)")
                 print("Error")
             }
-            
-            
-            //let responseString = String(data: data, encoding: .utf8)
-            //print("responseString = \(responseString)")
         }
         task.resume()
     }
@@ -371,10 +419,6 @@
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-    
-    
-    
     
     
     func btPin( titulo:String, subtitulo: String, lat: Double, long: Double) {
@@ -394,21 +438,20 @@
         gps.desiredAccuracy = kCLLocationAccuracyBest
         gps.requestWhenInUseAuthorization()
         // Tamaño inicial del mapa
-        //let centro = CLLocationCoordinate2DMake(self.latitud,self.longitud)
-        let centro = CLLocationCoordinate2DMake((gps.location?.coordinate.latitude)!,(gps.location?.coordinate.longitude)!)
         
-        let span = MKCoordinateSpan(latitudeDelta:0.01, longitudeDelta:0.01)
-        let region = MKCoordinateRegionMake(centro, span)
-        mapa.region = region
     }
     
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedWhenInUse{
             gps.startUpdatingLocation()
+            let centro = CLLocationCoordinate2DMake((gps.location?.coordinate.latitude)!,(gps.location?.coordinate.longitude)!)
+            let span = MKCoordinateSpan(latitudeDelta:0.01, longitudeDelta:0.01)
+            let region = MKCoordinateRegionMake(centro, span)
+            mapa.region = region
         }else if status == .denied{
             gps.stopUpdatingLocation()
-            print("Puedes activar la localizacion en Ajustes")
+            //print("Puedes activar la localizacion en Ajustes")
         }
     }
     
@@ -422,6 +465,7 @@
     
     
     // Helper for showing an alert
+    
     func showAlert(title : String, message: String) {
         let alert = UIAlertController(
             title: title,
@@ -450,39 +494,25 @@
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
         let avance = Double(totalBytesWritten)/Double(totalBytesExpectedToWrite)
-        print("Avance: \(avance*100)%")
+        //print("Avance: \(avance*100)%")
     }
     
     
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         do{
-            
-            
-            
-            
             let datosBin = try Data.init(contentsOf: location, options: .alwaysMapped)
             let respuesta = downloadTask.response as! HTTPURLResponse
             if respuesta.statusCode == 200 {
-                
-                
                 // Parsear los datos JSON
                 let cadena = String(data: datosBin, encoding: .utf8)
                 let resultadoCadena  = cadena
-                print(resultadoCadena!)
-                
-                
-                
-                
-                
-                
+                //print(resultadoCadena!)
                 let listaPines = resultadoCadena?.split(separator: "\n")
                 // var arregloPines = [String.SubSequence]()
                 for pin in listaPines!{
                     //let pines: String = pin.split(separator: ",")
                     arregloPines.append(pin)
                 }
-                
-                
                 // Iteracion arreglo
                 var titulo: String
                 var subtitulo: String
@@ -496,22 +526,13 @@
                     longitud = Double(llamada[3])!
                     btPin(titulo: titulo, subtitulo: subtitulo, lat: latitud, long: longitud)
                 }
-                
-                
             } else {
                 print("Error: \(respuesta.statusCode)")
             }
         } catch {
-            
-            
+            // Catch aquí
         }
     }
-    
-    
-    
-    
-    
-    
     
  }
  

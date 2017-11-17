@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		56B363D81FBF488F000B402A /* AcercaDeVCViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56B363D71FBF488F000B402A /* AcercaDeVCViewController.swift */; };
 		56DB1EE41F9E8812005782AC /* Puente.m in Sources */ = {isa = PBXBuildFile; fileRef = 56DB1EE31F9E8812005782AC /* Puente.m */; };
 		56DB1EE71F9E8F2E005782AC /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 56DB1EE61F9E8F2E005782AC /* GoogleService-Info.plist */; };
 		59EB7D551F9BD34300BEF835 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59EB7D541F9BD34300BEF835 /* AppDelegate.swift */; };
@@ -23,6 +24,7 @@
 
 /* Begin PBXFileReference section */
 		4773CFB4754F9EE42908DB6F /* Pods-Bware.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Bware.release.xcconfig"; path = "Pods/Target Support Files/Pods-Bware/Pods-Bware.release.xcconfig"; sourceTree = "<group>"; };
+		56B363D71FBF488F000B402A /* AcercaDeVCViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AcercaDeVCViewController.swift; sourceTree = "<group>"; };
 		56DB1EE11F9E8812005782AC /* Bware-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Bware-Bridging-Header.h"; sourceTree = "<group>"; };
 		56DB1EE21F9E8812005782AC /* Puente.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Puente.h; sourceTree = "<group>"; };
 		56DB1EE31F9E8812005782AC /* Puente.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Puente.m; sourceTree = "<group>"; };
@@ -98,6 +100,7 @@
 				56DB1EE31F9E8812005782AC /* Puente.m */,
 				56DB1EE11F9E8812005782AC /* Bware-Bridging-Header.h */,
 				96F149D01FBCC39200851813 /* Settings.bundle */,
+				56B363D71FBF488F000B402A /* AcercaDeVCViewController.swift */,
 			);
 			path = Bware;
 			sourceTree = "<group>";
@@ -255,6 +258,7 @@
 				59EB7D6E1F9BD57E00BEF835 /* ViewControllerMapa.swift in Sources */,
 				59EB7D571F9BD34300BEF835 /* ViewController.swift in Sources */,
 				59EB7D551F9BD34300BEF835 /* AppDelegate.swift in Sources */,
+				56B363D81FBF488F000B402A /* AcercaDeVCViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -395,11 +399,11 @@
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = D689726499;
+				DEVELOPMENT_TEAM = 5ZG36AH982;
 				INFOPLIST_FILE = Bware/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = ajsr.mx;
+				PRODUCT_BUNDLE_IDENTIFIER = dcbg.mx;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Bware/Bware-Bridging-Header.h";
@@ -417,11 +421,11 @@
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = D689726499;
+				DEVELOPMENT_TEAM = 5ZG36AH982;
 				INFOPLIST_FILE = Bware/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = ajsr.mx;
+				PRODUCT_BUNDLE_IDENTIFIER = dcbg.mx;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Bware/Bware-Bridging-Header.h";
